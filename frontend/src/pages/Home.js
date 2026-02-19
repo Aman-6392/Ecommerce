@@ -3,7 +3,9 @@ import axios from "axios";
 import { CartContext } from "../context/CartContext";
 import { useNavigate } from "react-router-dom";
 import "./Home.css";
+
 const API = process.env.REACT_APP_API_URL || "http://localhost:5000";
+
 function Home() {
 
     const { addToCart } = useContext(CartContext);
@@ -21,9 +23,17 @@ function Home() {
         const fetchProducts = async () => {
             try {
                 const res = await axios.get(`${API}/api/products`);
-                setProducts(res.data);
+
+                if (Array.isArray(res.data)) {
+                    setProducts(res.data);
+                } else {
+                    console.error("Products API returned non-array:", res.data);
+                    setProducts([]);
+                }
+
             } catch (error) {
-                console.error(error);
+                console.error("Products Fetch Error:", error);
+                setProducts([]);
             }
         };
 
@@ -36,8 +46,13 @@ function Home() {
 
             if (search.trim() !== "") {
                 axios.get(`${API}/api/products/search?q=${search}`)
-                    .then(res => setSuggestions(res.data))
-                    .catch(err => console.error(err));
+                    .then(res => {
+                        setSuggestions(Array.isArray(res.data) ? res.data : []);
+                    })
+                    .catch(err => {
+                        console.error("Search Error:", err);
+                        setSuggestions([]);
+                    });
             } else {
                 setSuggestions([]);
             }
@@ -54,22 +69,31 @@ function Home() {
         navigate(`/product/${product._id}`);
     };
 
-    const uniqueCompanies = [...new Set(products.map(p => p.company))];
-    const uniqueCategories = [...new Set(products.map(p => p.category))];
+    // 🔥 SAFE UNIQUE LISTS
+    const uniqueCompanies = Array.isArray(products)
+        ? [...new Set(products.map(p => p.company))]
+        : [];
 
-    const filteredProducts = products.filter(product => {
+    const uniqueCategories = Array.isArray(products)
+        ? [...new Set(products.map(p => p.category))]
+        : [];
 
-        const matchSearch =
-            product.name?.toLowerCase().includes(search.toLowerCase());
+    // 🔥 SAFE FILTER
+    const filteredProducts = Array.isArray(products)
+        ? products.filter(product => {
 
-        const matchCompany =
-            companyFilter === "" || product.company === companyFilter;
+            const matchSearch =
+                product.name?.toLowerCase().includes(search.toLowerCase());
 
-        const matchCategory =
-            categoryFilter === "" || product.category === categoryFilter;
+            const matchCompany =
+                companyFilter === "" || product.company === companyFilter;
 
-        return matchSearch && matchCompany && matchCategory;
-    });
+            const matchCategory =
+                categoryFilter === "" || product.category === categoryFilter;
+
+            return matchSearch && matchCompany && matchCategory;
+        })
+        : [];
 
     return (
         <div className="container">
