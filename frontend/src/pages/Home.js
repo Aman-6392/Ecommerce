@@ -24,10 +24,13 @@ function Home() {
             try {
                 const res = await axios.get(`${API}/api/products`);
 
+                // 🔥 Handle both formats safely
                 if (Array.isArray(res.data)) {
                     setProducts(res.data);
+                } else if (Array.isArray(res.data.products)) {
+                    setProducts(res.data.products);
                 } else {
-                    console.error("Products API returned non-array:", res.data);
+                    console.error("Invalid products response:", res.data);
                     setProducts([]);
                 }
 
@@ -39,7 +42,6 @@ function Home() {
 
         fetchProducts();
     }, []);
-
     // ================= SEARCH SUGGESTIONS =================
     useEffect(() => {
         const delay = setTimeout(() => {
