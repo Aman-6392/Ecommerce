@@ -10,40 +10,48 @@ export const CartProvider = ({ children }) => {
         return savedCart ? JSON.parse(savedCart) : [];
     });
 
-    // Save cart whenever it changes
+    // Save cart whenever cart changes
     useEffect(() => {
         localStorage.setItem("cart", JSON.stringify(cart));
     }, [cart]);
 
+    // Add to cart
     const addToCart = (product) => {
-        setCart(prevCart => {
-            const existing = prevCart.find(item => item._id === product._id);
+        setCart((prevCart) => {
+            const existingItem = prevCart.find(
+                (item) => item._id === product._id
+            );
 
-            if (existing) {
-                return prevCart.map(item =>
+            if (existingItem) {
+                return prevCart.map((item) =>
                     item._id === product._id
                         ? { ...item, quantity: item.quantity + 1 }
                         : item
                 );
-            } else {
-                return [...prevCart, { ...product, quantity: 1 }];
             }
+
+            return [...prevCart, { ...product, quantity: 1 }];
         });
     };
 
+    // Remove item
     const removeFromCart = (id) => {
-        setCart(prevCart =>
-            prevCart.filter(item => item._id !== id)
+        setCart((prevCart) =>
+            prevCart.filter((item) => item._id !== id)
         );
     };
 
+    // Clear entire cart
     const clearCart = () => {
         setCart([]);
+        localStorage.removeItem("cart");
     };
 
+    // Get total price
     const getTotal = () => {
         return cart.reduce(
-            (total, item) => total + item.price * item.quantity,
+            (total, item) =>
+                total + item.price * item.quantity,
             0
         );
     };

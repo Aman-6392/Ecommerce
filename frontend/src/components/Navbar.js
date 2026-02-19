@@ -55,8 +55,9 @@ function Navbar() {
 
                     <Link
                         to="/cart"
-                        className={`cart-link ${location.pathname === "/cart" ? "active" : ""
-                            }`}
+                        className={`cart-link ${
+                            location.pathname === "/cart" ? "active" : ""
+                        }`}
                         onClick={closeMenu}
                     >
                         🛒
