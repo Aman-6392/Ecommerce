@@ -6,201 +6,208 @@ import "./Home.css";
 
 function Home() {
 
-  const API =
-    process.env.REACT_APP_API_URL || "http://localhost:5000";
+    const API =
+        process.env.REACT_APP_API_URL || "http://localhost:5000";
 
-  const { addToCart } = useContext(CartContext);
-  const navigate = useNavigate();
+    const { addToCart } = useContext(CartContext);
+    const navigate = useNavigate();
 
-  const [products, setProducts] = useState([]);
-  const [search, setSearch] = useState("");
-  const [suggestions, setSuggestions] = useState("");
+    const [products, setProducts] = useState([]);
+    const [search, setSearch] = useState("");
+    const [suggestions, setSuggestions] = useState([]);
 
-  const [companyFilter, setCompanyFilter] = useState("");
-  const [categoryFilter, setCategoryFilter] = useState("");
+    const [companyFilter, setCompanyFilter] = useState("");
+    const [categoryFilter, setCategoryFilter] = useState("");
 
-  // ================= FETCH PRODUCTS =================
-  useEffect(() => {
-    axios.get(`${API}/api/products`)
-      .then(res => setProducts(res.data))
-      .catch(err => console.error("Product Load Error:", err));
-  }, []);
+    // ================= FETCH PRODUCTS =================
+    useEffect(() => {
+        const fetchProducts = async () => {
+            try {
+                const res = await axios.get(`${API}/api/products`);
+                setProducts(res.data);
+            } catch (error) {
+                console.error(error);
+            }
+        };
 
-  // ================= SEARCH SUGGESTIONS =================
-  useEffect(() => {
-    const delay = setTimeout(() => {
+        fetchProducts();
+    }, [API]);
 
-      if (search.trim() !== "") {
-        axios.get(`${API}/api/products/search?q=${search}`)
-          .then(res => setSuggestions(res.data))
-          .catch(err => console.error(err));
-      } else {
+    // ================= SEARCH SUGGESTIONS =================
+    useEffect(() => {
+        const delay = setTimeout(() => {
+
+            if (search.trim() !== "") {
+                axios.get(`${API}/api/products/search?q=${search}`)
+                    .then(res => setSuggestions(res.data))
+                    .catch(err => console.error(err));
+            } else {
+                setSuggestions([]);
+            }
+
+        }, 300);
+
+        return () => clearTimeout(delay);
+
+    }, [API, search]);
+
+    const handleSuggestionClick = (product) => {
+        setSearch("");
         setSuggestions([]);
-      }
+        navigate(`/product/${product._id}`);
+    };
 
-    }, 300);
+    const uniqueCompanies = [...new Set(products.map(p => p.company))];
+    const uniqueCategories = [...new Set(products.map(p => p.category))];
 
-    return () => clearTimeout(delay);
+    const filteredProducts = products.filter(product => {
 
-  }, [search]);
+        const matchSearch =
+            product.name?.toLowerCase().includes(search.toLowerCase());
 
-  const handleSuggestionClick = (product) => {
-    setSearch("");
-    setSuggestions([]);
-    navigate(`/product/${product._id}`);
-  };
+        const matchCompany =
+            companyFilter === "" || product.company === companyFilter;
 
-  const uniqueCompanies = [...new Set(products.map(p => p.company))];
-  const uniqueCategories = [...new Set(products.map(p => p.category))];
+        const matchCategory =
+            categoryFilter === "" || product.category === categoryFilter;
 
-  const filteredProducts = products.filter(product => {
+        return matchSearch && matchCompany && matchCategory;
+    });
 
-    const matchSearch =
-      product.name?.toLowerCase().includes(search.toLowerCase());
+    return (
+        <div className="container">
 
-    const matchCompany =
-      companyFilter === "" || product.company === companyFilter;
+            {/* SEARCH */}
+            <div className="search-wrapper">
 
-    const matchCategory =
-      categoryFilter === "" || product.category === categoryFilter;
-
-    return matchSearch && matchCompany && matchCategory;
-  });
-
-  return (
-    <div className="container">
-
-      {/* SEARCH */}
-      <div className="search-wrapper">
-
-        <input
-          className="search-box"
-          type="text"
-          placeholder="Search products..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
-
-        {suggestions.length > 0 && (
-          <div className="suggestions">
-            {suggestions.map(item => (
-              <div
-                key={item._id}
-                className="suggestion-item"
-                onClick={() => handleSuggestionClick(item)}
-              >
-                <img
-                  src={`${API}/${item.image?.replace(/^\/+/, "")}`}
-                  alt={item.name}
-                  className="suggestion-img"
+                <input
+                    className="search-box"
+                    type="text"
+                    placeholder="Search products..."
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
                 />
 
-                <div>
-                  <p><strong>{item.name}</strong></p>
-                  <p className="company-name">{item.company}</p>
-                  <p className="suggestion-price">
-                    ₹{item.price}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
+                {suggestions.length > 0 && (
+                    <div className="suggestions">
+                        {suggestions.map(item => (
+                            <div
+                                key={item._id}
+                                className="suggestion-item"
+                                onClick={() => handleSuggestionClick(item)}
+                            >
+                                <img
+                                    src={`${API}/${item.image?.replace(/^\/+/, "")}`}
+                                    alt={item.name}
+                                    className="suggestion-img"
+                                />
 
-      </div>
+                                <div>
+                                    <p><strong>{item.name}</strong></p>
+                                    <p className="company-name">{item.company}</p>
+                                    <p className="suggestion-price">
+                                        ₹{item.price}
+                                    </p>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                )}
 
-      {/* FILTERS */}
-      <div className="filter-section">
+            </div>
 
-        <select
-          value={companyFilter}
-          onChange={(e) => setCompanyFilter(e.target.value)}
-        >
-          <option value="">All Companies</option>
-          {uniqueCompanies.map((company, index) => (
-            <option key={index} value={company}>
-              {company}
-            </option>
-          ))}
-        </select>
+            {/* FILTERS */}
+            <div className="filter-section">
 
-        <select
-          value={categoryFilter}
-          onChange={(e) => setCategoryFilter(e.target.value)}
-        >
-          <option value="">All Categories</option>
-          {uniqueCategories.map((cat, index) => (
-            <option key={index} value={cat}>
-              {cat}
-            </option>
-          ))}
-        </select>
+                <select
+                    value={companyFilter}
+                    onChange={(e) => setCompanyFilter(e.target.value)}
+                >
+                    <option value="">All Companies</option>
+                    {uniqueCompanies.map((company, index) => (
+                        <option key={index} value={company}>
+                            {company}
+                        </option>
+                    ))}
+                </select>
 
-        <button
-          className="clear-btn"
-          onClick={() => {
-            setCompanyFilter("");
-            setCategoryFilter("");
-          }}
-        >
-          Clear
-        </button>
+                <select
+                    value={categoryFilter}
+                    onChange={(e) => setCategoryFilter(e.target.value)}
+                >
+                    <option value="">All Categories</option>
+                    {uniqueCategories.map((cat, index) => (
+                        <option key={index} value={cat}>
+                            {cat}
+                        </option>
+                    ))}
+                </select>
 
-      </div>
+                <button
+                    className="clear-btn"
+                    onClick={() => {
+                        setCompanyFilter("");
+                        setCategoryFilter("");
+                    }}
+                >
+                    Clear
+                </button>
 
-      {/* PRODUCTS */}
-      <h2 className="section-title">Featured Products</h2>
+            </div>
 
-      <div className="product-grid">
+            {/* PRODUCTS */}
+            <h2 className="section-title">Featured Products</h2>
 
-        {filteredProducts.length === 0 && (
-          <p>No products found.</p>
-        )}
+            <div className="product-grid">
 
-        {filteredProducts.map(product => (
+                {filteredProducts.length === 0 && (
+                    <p>No products found.</p>
+                )}
 
-          <div
-            key={product._id}
-            className="product-card"
-            onClick={() => navigate(`/product/${product._id}`)}
-            style={{ cursor: "pointer" }}
-          >
+                {filteredProducts.map(product => (
 
-            <img
-              src={`${API}/${product.image?.replace(/^\/+/, "")}`}
-              alt={product.name}
-            />
+                    <div
+                        key={product._id}
+                        className="product-card"
+                        onClick={() => navigate(`/product/${product._id}`)}
+                        style={{ cursor: "pointer" }}
+                    >
 
-            <h4>{product.name}</h4>
+                        <img
+                            src={`${API}/${product.image?.replace(/^\/+/, "")}`}
+                            alt={product.name}
+                        />
 
-            <p className="company-name">{product.company}</p>
+                        <h4>{product.name}</h4>
 
-            <p className="price">₹{product.price}</p>
+                        <p className="company-name">{product.company}</p>
 
-            {product.stock > 0 ? (
-              <span className="in-stock">In Stock</span>
-            ) : (
-              <span className="out-stock">Out of Stock</span>
-            )}
+                        <p className="price">₹{product.price}</p>
 
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                addToCart(product);
-              }}
-              disabled={product.stock === 0}
-            >
-              Add to Cart
-            </button>
+                        {product.stock > 0 ? (
+                            <span className="in-stock">In Stock</span>
+                        ) : (
+                            <span className="out-stock">Out of Stock</span>
+                        )}
 
-          </div>
+                        <button
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                addToCart(product);
+                            }}
+                            disabled={product.stock === 0}
+                        >
+                            Add to Cart
+                        </button>
 
-        ))}
+                    </div>
 
-      </div>
+                ))}
 
-    </div>
-  );
+            </div>
+
+        </div>
+    );
 }
 
 export default Home;
