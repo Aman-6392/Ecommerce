@@ -1,101 +1,73 @@
 /* =========================
-   PAGE BACKGROUND
+   PAGE LAYOUT
 ========================= */
 .checkoutPage {
   min-height: 100vh;
-  background: linear-gradient(120deg, #f8fafc, #eef2f7);
+  background: #f4f6f9;
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 40px 15px 60px;
+  justify-content: center;
+  padding: 50px 20px;
 }
 
 /* =========================
-   WRAPPER
+   MAIN CONTAINER
 ========================= */
 .checkoutWrapper {
   width: 100%;
-  max-width: 950px;
+  max-width: 780px;
 }
 
 /* =========================
-   CARD DESIGN (Premium Glass)
+   CARD
 ========================= */
 .checkoutCard {
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(10px);
-  padding: 50px 45px;
-  border-radius: 22px;
-  box-shadow:
-    0 10px 30px rgba(0, 0, 0, 0.05),
-    0 20px 60px rgba(0, 0, 0, 0.06);
-  transition: all 0.35s ease;
-  border: 1px solid rgba(255, 255, 255, 0.4);
-}
-
-.checkoutCard:hover {
-  transform: translateY(-5px);
+  background: #ffffff;
+  padding: 40px;
+  border-radius: 14px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+  border: 1px solid #ececec;
 }
 
 /* =========================
-   TITLE SECTION
+   TITLE
 ========================= */
 .title {
   font-size: 26px;
   font-weight: 700;
   color: #111827;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
 .subtitle {
   font-size: 14px;
   color: #6b7280;
-  margin-bottom: 35px;
+  margin-bottom: 30px;
 }
 
 /* =========================
-   ERROR BOX
+   ERROR
 ========================= */
 .formError {
-  background: #fff1f2;
+  background: #fff5f5;
   color: #dc2626;
-  padding: 14px 18px;
-  border-radius: 12px;
-  margin-bottom: 25px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 20px;
   font-size: 14px;
-  border-left: 5px solid #ef4444;
-  animation: shake 0.25s ease-in-out;
-}
-
-@keyframes shake {
-  0% {
-    transform: translateX(0);
-  }
-
-  25% {
-    transform: translateX(-4px);
-  }
-
-  50% {
-    transform: translateX(4px);
-  }
-
-  75% {
-    transform: translateX(-3px);
-  }
-
-  100% {
-    transform: translateX(0);
-  }
+  border-left: 4px solid #ef4444;
 }
 
 /* =========================
-   FORM GRID
+   GRID
 ========================= */
 .formGrid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 25px;
+  gap: 20px;
+}
+
+.fullWidth {
+  grid-column: span 2;
 }
 
 .formGroup {
@@ -103,16 +75,11 @@
   flex-direction: column;
 }
 
-.fullWidth {
-  grid-column: span 2;
-}
-
 .formGroup label {
   font-size: 13px;
   font-weight: 600;
-  margin-bottom: 7px;
+  margin-bottom: 6px;
   color: #374151;
-  letter-spacing: 0.3px;
 }
 
 /* =========================
@@ -120,12 +87,12 @@
 ========================= */
 .inputField,
 .stateSelect {
-  padding: 14px 16px;
-  border-radius: 12px;
-  border: 1px solid #e5e7eb;
+  padding: 12px 14px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
   font-size: 14px;
-  background: #f9fafb;
-  transition: all 0.3s ease;
+  background: #ffffff;
+  transition: all 0.2s ease;
 }
 
 .inputField::placeholder {
@@ -136,76 +103,56 @@
 .stateSelect:focus {
   outline: none;
   border-color: #ff7a00;
-  background: #ffffff;
-  box-shadow: 0 0 0 4px rgba(255, 122, 0, 0.15);
-  transform: translateY(-1px);
-}
-
-/* Hover Effect */
-.inputField:hover,
-.stateSelect:hover {
-  border-color: #d1d5db;
-  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(255, 122, 0, 0.15);
 }
 
 /* =========================
-   BUTTONS
+   BUTTON SECTION
 ========================= */
 .btnGroup {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 40px;
-  gap: 20px;
+  margin-top: 35px;
 }
 
 /* Back Button */
 .backBtn {
   background: transparent;
-  border: 2px solid #d1d5db;
+  border: 1.5px solid #d1d5db;
   color: #374151;
-  padding: 13px 26px;
-  border-radius: 40px;
+  padding: 11px 22px;
+  border-radius: 30px;
   cursor: pointer;
   font-weight: 600;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
 }
 
 .backBtn:hover {
   background: #f3f4f6;
-  border-color: #9ca3af;
-  transform: translateY(-2px);
 }
 
-/* Primary CTA */
+/* Primary Button */
 .primaryBtn {
-  background: linear-gradient(135deg, #ff9900, #ff6a00);
+  background: #ff7a00;
   color: #fff;
   border: none;
-  padding: 14px 28px;
-  border-radius: 12px;
+  padding: 12px 28px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
   cursor: pointer;
-  font-weight: 700;
-  font-size: 15px;
-  letter-spacing: 0.4px;
-  transition: all 0.3s ease;
-  box-shadow: 0 8px 20px rgba(255, 122, 0, 0.3);
+  transition: all 0.25s ease;
 }
 
 .primaryBtn:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 12px 30px rgba(255, 122, 0, 0.45);
+  background: #e66d00;
+  transform: translateY(-1px);
 }
 
 /* =========================
    RESPONSIVE
 ========================= */
-@media (max-width: 900px) {
-  .checkoutCard {
-    padding: 35px 25px;
-  }
-}
-
 @media (max-width: 768px) {
   .formGrid {
     grid-template-columns: 1fr;
@@ -217,20 +164,11 @@
 
   .btnGroup {
     flex-direction: column;
+    gap: 15px;
   }
 
   .primaryBtn,
   .backBtn {
     width: 100%;
-  }
-}
-
-@media (max-width: 480px) {
-  .title {
-    font-size: 22px;
-  }
-
-  .checkoutCard {
-    padding: 25px 18px;
   }
 }
