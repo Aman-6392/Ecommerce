@@ -3,16 +3,12 @@ import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { CartContext } from "../context/CartContext";
 import "./ProductPage.css";
-
+  const API = process.env.REACT_APP_API_URL || "http://localhost:5000";
 function ProductPage() {
 
   const { id } = useParams();
   const navigate = useNavigate();
   const { addToCart } = useContext(CartContext);
-
-  const API =
-    process.env.REACT_APP_API_URL || "http://localhost:5000";
-
   const [product, setProduct] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [loading, setLoading] = useState(true);

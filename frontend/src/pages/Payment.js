@@ -4,11 +4,8 @@ import { useNavigate } from "react-router-dom";
 import { CartContext } from "../context/CartContext";
 import StepIndicator from "../components/StepIndicator";
 import styles from "./Payment.module.css";
-
+ const API = process.env.REACT_APP_API_URL || "http://localhost:5000";
 function Payment() {
-
-  const API =
-    process.env.REACT_APP_API_URL || "http://localhost:5000";
 
   const RAZORPAY_KEY =
     process.env.REACT_APP_RAZORPAY_KEY || "rzp_test_xxxxx";
@@ -41,7 +38,7 @@ function Payment() {
       navigate("/address");
     }
 
-  }, []);
+  }, [token, cart.length, navigate]);
 
   // ================= PAYMENT =================
   const handlePayment = async () => {

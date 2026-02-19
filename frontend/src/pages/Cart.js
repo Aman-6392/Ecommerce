@@ -3,10 +3,9 @@ import { CartContext } from "../context/CartContext";
 import "./Cart.css";
 import StepIndicator from "../components/StepIndicator";
 import { useNavigate } from "react-router-dom";
+  const API = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
 function Cart() {
-  const API =
-    process.env.REACT_APP_API_URL || "http://localhost:5000";
 
   const { cart, addToCart, decreaseQuantity, removeFromCart, getTotal } =
     useContext(CartContext);

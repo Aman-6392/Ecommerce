@@ -3,11 +3,8 @@ import axios from "axios";
 import { CartContext } from "../context/CartContext";
 import { useNavigate } from "react-router-dom";
 import "./Home.css";
-
+const API = process.env.REACT_APP_API_URL || "http://localhost:5000";
 function Home() {
-
-    const API =
-        process.env.REACT_APP_API_URL || "http://localhost:5000";
 
     const { addToCart } = useContext(CartContext);
     const navigate = useNavigate();
@@ -31,7 +28,7 @@ function Home() {
         };
 
         fetchProducts();
-    }, [API]);
+    }, []);
 
     // ================= SEARCH SUGGESTIONS =================
     useEffect(() => {
@@ -49,7 +46,7 @@ function Home() {
 
         return () => clearTimeout(delay);
 
-    }, [API, search]);
+    }, [search]);
 
     const handleSuggestionClick = (product) => {
         setSearch("");

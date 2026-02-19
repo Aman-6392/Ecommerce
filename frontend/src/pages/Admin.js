@@ -2,13 +2,9 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import "./Admin.css";
-
+  const API = process.env.REACT_APP_API_URL || "http://localhost:5000";
 function Admin() {
   const navigate = useNavigate();
-
-  const API =
-    process.env.REACT_APP_API_URL || "http://localhost:5000";
-
   const token = localStorage.getItem("token");
   const role = localStorage.getItem("role");
 
@@ -39,7 +35,7 @@ function Admin() {
       return;
     }
     loadProducts();
-  }, []);
+  }, [token, role, navigate]);
 
   // ================= LOAD PRODUCTS =================
   const loadProducts = async () => {
