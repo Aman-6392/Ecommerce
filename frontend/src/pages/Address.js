@@ -101,19 +101,22 @@ function Address() {
               />
             </div>
 
-            <input
-              className={styles.inputField}
-              name="phone"
-              value={address.phone}
-              onChange={(e) =>
-                setAddress({
-                  ...address,
-                  phone: e.target.value.replace(/\D/g, ""),
-                })
-              }
-              placeholder="10-digit mobile number"
-              maxLength="10"
-            />
+            <div className={styles.formGroup}>
+              <label>Mobile Number</label>
+              <input
+                className={styles.inputField}
+                name="phone"
+                value={address.phone}
+                onChange={(e) =>
+                  setAddress({
+                    ...address,
+                    phone: e.target.value.replace(/\D/g, ""),
+                  })
+                }
+                placeholder="10-digit mobile number"
+                maxLength="10"
+              />
+            </div>
 
             <div className={`${styles.formGroup} ${styles.fullWidth}`}>
               <label>Street Address</label>
