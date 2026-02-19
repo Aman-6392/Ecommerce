@@ -2,8 +2,14 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./Address.module.css";
 import StepIndicator from "../components/StepIndicator";
-
+import { useEffect } from "react";
 function Address() {
+  useEffect(() => {
+    const cart = JSON.parse(localStorage.getItem("cart") || "[]");
+    if (cart.length === 0) {
+      navigate("/");
+    }
+  }, []);
   const navigate = useNavigate();
 
   const indianStates = [
@@ -20,13 +26,18 @@ function Address() {
     "Lakshadweep", "Puducherry"
   ];
 
-  const [address, setAddress] = useState({
-    name: "",
-    phone: "",
-    street: "",
-    city: "",
-    state: "",
-    pincode: "",
+  const [address, setAddress] = useState(() => {
+    const saved = localStorage.getItem("shippingAddress");
+    return saved
+      ? JSON.parse(saved)
+      : {
+        name: "",
+        phone: "",
+        street: "",
+        city: "",
+        state: "",
+        pincode: "",
+      };
   });
 
   const [error, setError] = useState("");
@@ -39,6 +50,10 @@ function Address() {
   };
 
   const handleContinue = () => {
+    if (Object.values(address).some(value => !value.trim())) {
+      setError("Please fill all fields");
+      return;
+    }
     const { name, phone, street, city, state, pincode } = address;
 
     if (!name || !phone || !street || !city || !state || !pincode) {
@@ -86,17 +101,19 @@ function Address() {
               />
             </div>
 
-            <div className={styles.formGroup}>
-              <label>Phone Number</label>
-              <input
-                className={styles.inputField}
-                name="phone"
-                value={address.phone}
-                onChange={handleChange}
-                placeholder="10-digit mobile number"
-                maxLength="10"
-              />
-            </div>
+            <input
+              className={styles.inputField}
+              name="phone"
+              value={address.phone}
+              onChange={(e) =>
+                setAddress({
+                  ...address,
+                  phone: e.target.value.replace(/\D/g, ""),
+                })
+              }
+              placeholder="10-digit mobile number"
+              maxLength="10"
+            />
 
             <div className={`${styles.formGroup} ${styles.fullWidth}`}>
               <label>Street Address</label>
@@ -137,17 +154,19 @@ function Address() {
               </select>
             </div>
 
-            <div className={`${styles.formGroup} ${styles.fullWidth}`}>
-              <label>Pincode</label>
-              <input
-                className={styles.inputField}
-                name="pincode"
-                value={address.pincode}
-                onChange={handleChange}
-                placeholder="6-digit pincode"
-                maxLength="6"
-              />
-            </div>
+            <input
+              className={styles.inputField}
+              name="pincode"
+              value={address.pincode}
+              onChange={(e) =>
+                setAddress({
+                  ...address,
+                  pincode: e.target.value.replace(/\D/g, ""),
+                })
+              }
+              placeholder="6-digit pincode"
+              maxLength="6"
+            />
           </div>
 
           <div className={styles.btnGroup}>

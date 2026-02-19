@@ -1,16 +1,55 @@
-const addProduct = (req, res) => {
-  console.log("BODY:", req.body);
-  console.log("FILE:", req.file);
+const Product = require("../models/product");
 
-  res.json({
-    message: "Product added successfully",
-    product: req.body,
-    image: req.file,
-  });
+// ================= ADD PRODUCT =================
+const addProduct = async (req, res) => {
+  try {
+    const { name, price, category, description, stock, company } = req.body;
+
+    if (!name || !price || !category || !company) {
+      return res.status(400).json({ message: "Required fields missing" });
+    }
+
+    if (!req.file) {
+      return res.status(400).json({ message: "Product image required" });
+    }
+
+    const newProduct = new Product({
+      name,
+      price,
+      category,
+      description,
+      stock,
+      company,
+      image: req.file.path // Cloudinary URL
+    });
+
+    await newProduct.save();
+
+    res.status(201).json({
+      message: "Product added successfully",
+      product: newProduct
+    });
+
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
 };
 
-const deleteProduct = (req, res) => {
-  res.json({ message: "Product deleted successfully" });
+
+// ================= DELETE PRODUCT =================
+const deleteProduct = async (req, res) => {
+  try {
+    const deleted = await Product.findByIdAndDelete(req.params.id);
+
+    if (!deleted) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    res.json({ message: "Product deleted successfully" });
+
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
 };
 
 module.exports = { addProduct, deleteProduct };

@@ -6,34 +6,47 @@ import { useNavigate } from "react-router-dom";
 function Register() {
 
   const navigate = useNavigate();
-  const API = process.env.REACT_APP_API_URL;
+
+  const API =
+    process.env.REACT_APP_API_URL || "http://localhost:5000";
+
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleRegister = async (e) => {
-    e.preventDefault();  // ✅ important for Enter key
+    e.preventDefault();
 
     try {
       setLoading(true);
 
       await axios.post(
         `${API}/api/auth/register`,
-        { name, email, password }
+        {
+          name: name.trim(),
+          email: email.trim(),
+          password: password.trim()
+        },
+        {
+          withCredentials: true
+        }
       );
 
       alert("Registered Successfully");
 
-      // ✅ Clear form
       setName("");
       setEmail("");
       setPassword("");
 
-      // ✅ Redirect to login page
       navigate("/login");
 
     } catch (err) {
+      console.error(
+        "Register Error:",
+        err.response?.data || err
+      );
+
       alert(
         err.response?.data?.message ||
         "Registration failed. Please try again."
@@ -47,7 +60,7 @@ function Register() {
     <div className="register-container">
       <div className="register-card">
 
-        <form onSubmit={handleRegister}>  {/* ✅ form added */}
+        <form onSubmit={handleRegister}>
 
           <h2>Create Account</h2>
 
@@ -55,7 +68,9 @@ function Register() {
             type="text"
             placeholder="Full Name"
             value={name}
-            onChange={(e) => setName(e.target.value)}
+            onChange={(e) =>
+              setName(e.target.value)
+            }
             required
           />
 
@@ -63,7 +78,9 @@ function Register() {
             type="email"
             placeholder="Email Address"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) =>
+              setEmail(e.target.value)
+            }
             required
           />
 
@@ -71,7 +88,9 @@ function Register() {
             type="password"
             placeholder="Password"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={(e) =>
+              setPassword(e.target.value)
+            }
             required
           />
 
@@ -80,7 +99,9 @@ function Register() {
             className="register-btn"
             disabled={loading}
           >
-            {loading ? "Registering..." : "Register"}
+            {loading
+              ? "Registering..."
+              : "Register"}
           </button>
 
         </form>

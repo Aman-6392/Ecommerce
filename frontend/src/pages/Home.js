@@ -5,215 +5,202 @@ import { useNavigate } from "react-router-dom";
 import "./Home.css";
 
 function Home() {
-    const API = process.env.REACT_APP_API_URL;
 
-    const { addToCart } = useContext(CartContext);
-    const navigate = useNavigate();
+  const API =
+    process.env.REACT_APP_API_URL || "http://localhost:5000";
 
-    const [products, setProducts] = useState([]);
-    const [search, setSearch] = useState("");
-    const [suggestions, setSuggestions] = useState([]);
+  const { addToCart } = useContext(CartContext);
+  const navigate = useNavigate();
 
-    // ✅ Filter States
-    const [companyFilter, setCompanyFilter] = useState("");
-    const [categoryFilter, setCategoryFilter] = useState("");
+  const [products, setProducts] = useState([]);
+  const [search, setSearch] = useState("");
+  const [suggestions, setSuggestions] = useState("");
 
-    // ================= FETCH PRODUCTS =================
-    useEffect(() => {
-        axios.get(`${API}/api/products`)
-            .then(res => setProducts(res.data))
-            .catch(err => console.log(err));
-    }, []);
+  const [companyFilter, setCompanyFilter] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("");
 
-    // ================= SEARCH SUGGESTIONS =================
-    useEffect(() => {
-        const delay = setTimeout(() => {
+  // ================= FETCH PRODUCTS =================
+  useEffect(() => {
+    axios.get(`${API}/api/products`)
+      .then(res => setProducts(res.data))
+      .catch(err => console.error("Product Load Error:", err));
+  }, []);
 
-            if (search.trim() !== "") {
-                axios.get(`${API}/api/products/search?q=${search}`)
-                    .then(res => setSuggestions(res.data))
-                    .catch(err => console.log(err));
-            } else {
-                setSuggestions([]);
-            }
+  // ================= SEARCH SUGGESTIONS =================
+  useEffect(() => {
+    const delay = setTimeout(() => {
 
-        }, 300);
-
-        return () => clearTimeout(delay);
-
-    }, [search]);
-
-    // 🔥 Redirect on suggestion click
-    const handleSuggestionClick = (product) => {
-        setSearch("");
+      if (search.trim() !== "") {
+        axios.get(`${API}/api/products/search?q=${search}`)
+          .then(res => setSuggestions(res.data))
+          .catch(err => console.error(err));
+      } else {
         setSuggestions([]);
-        navigate(`/product/${product._id}`);
-    };
+      }
 
-    // ================= UNIQUE FILTER VALUES =================
-    const uniqueCompanies = [...new Set(products.map(p => p.company))];
-    const uniqueCategories = [...new Set(products.map(p => p.category))];
+    }, 300);
 
-    // ================= FILTER LOGIC =================
-    const filteredProducts = products.filter(product => {
+    return () => clearTimeout(delay);
 
-        const matchSearch =
-            product.name.toLowerCase().includes(search.toLowerCase());
+  }, [search]);
 
-        const matchCompany =
-            companyFilter === "" || product.company === companyFilter;
+  const handleSuggestionClick = (product) => {
+    setSearch("");
+    setSuggestions([]);
+    navigate(`/product/${product._id}`);
+  };
 
-        const matchCategory =
-            categoryFilter === "" || product.category === categoryFilter;
+  const uniqueCompanies = [...new Set(products.map(p => p.company))];
+  const uniqueCategories = [...new Set(products.map(p => p.category))];
 
-        return matchSearch && matchCompany && matchCategory;
-    });
+  const filteredProducts = products.filter(product => {
 
-    return (
-        <div className="container">
+    const matchSearch =
+      product.name?.toLowerCase().includes(search.toLowerCase());
 
-           
+    const matchCompany =
+      companyFilter === "" || product.company === companyFilter;
 
-            {/* ================= SEARCH SECTION ================= */}
-            <div className="search-wrapper">
+    const matchCategory =
+      categoryFilter === "" || product.category === categoryFilter;
 
-                <input
-                    className="search-box"
-                    type="text"
-                    placeholder="Search products..."
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
+    return matchSearch && matchCompany && matchCategory;
+  });
+
+  return (
+    <div className="container">
+
+      {/* SEARCH */}
+      <div className="search-wrapper">
+
+        <input
+          className="search-box"
+          type="text"
+          placeholder="Search products..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+
+        {suggestions.length > 0 && (
+          <div className="suggestions">
+            {suggestions.map(item => (
+              <div
+                key={item._id}
+                className="suggestion-item"
+                onClick={() => handleSuggestionClick(item)}
+              >
+                <img
+                  src={`${API}/${item.image?.replace(/^\/+/, "")}`}
+                  alt={item.name}
+                  className="suggestion-img"
                 />
 
-                {suggestions.length > 0 && (
-                    <div className="suggestions">
-                        {suggestions.map(item => (
-                            <div
-                                key={item._id}
-                                className="suggestion-item"
-                                onClick={() => handleSuggestionClick(item)}
-                            >
-                                <img
-                                    src={`${API}${item.image}`}
-                                    alt={item.name}
-                                    className="suggestion-img"
-                                />
+                <div>
+                  <p><strong>{item.name}</strong></p>
+                  <p className="company-name">{item.company}</p>
+                  <p className="suggestion-price">
+                    ₹{item.price}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
 
-                                <div>
-                                    <p><strong>{item.name}</strong></p>
-                                    <p className="company-name">
-                                        {item.company}
-                                    </p>
-                                    <p className="suggestion-price">
-                                        ₹{item.price}
-                                    </p>
-                                </div>
+      </div>
 
-                            </div>
-                        ))}
-                    </div>
-                )}
+      {/* FILTERS */}
+      <div className="filter-section">
 
-            </div>
+        <select
+          value={companyFilter}
+          onChange={(e) => setCompanyFilter(e.target.value)}
+        >
+          <option value="">All Companies</option>
+          {uniqueCompanies.map((company, index) => (
+            <option key={index} value={company}>
+              {company}
+            </option>
+          ))}
+        </select>
 
-            {/* ================= FILTER SECTION ================= */}
-            <div className="filter-section">
+        <select
+          value={categoryFilter}
+          onChange={(e) => setCategoryFilter(e.target.value)}
+        >
+          <option value="">All Categories</option>
+          {uniqueCategories.map((cat, index) => (
+            <option key={index} value={cat}>
+              {cat}
+            </option>
+          ))}
+        </select>
 
-                <select
-                    value={companyFilter}
-                    onChange={(e) => setCompanyFilter(e.target.value)}
-                >
-                    <option value="">All Companies</option>
-                    {uniqueCompanies.map((company, index) => (
-                        <option key={index} value={company}>
-                            {company}
-                        </option>
-                    ))}
-                </select>
+        <button
+          className="clear-btn"
+          onClick={() => {
+            setCompanyFilter("");
+            setCategoryFilter("");
+          }}
+        >
+          Clear
+        </button>
 
-                <select
-                    value={categoryFilter}
-                    onChange={(e) => setCategoryFilter(e.target.value)}
-                >
-                    <option value="">All Categories</option>
-                    {uniqueCategories.map((cat, index) => (
-                        <option key={index} value={cat}>
-                            {cat}
-                        </option>
-                    ))}
-                </select>
+      </div>
 
-                <button
-                    className="clear-btn"
-                    onClick={() => {
-                        setCompanyFilter("");
-                        setCategoryFilter("");
-                    }}
-                >
-                    Clear
-                </button>
+      {/* PRODUCTS */}
+      <h2 className="section-title">Featured Products</h2>
 
-            </div>
+      <div className="product-grid">
 
-            {/* ================= PRODUCTS ================= */}
-            <h2 className="section-title">
-                Featured Products
-            </h2>
+        {filteredProducts.length === 0 && (
+          <p>No products found.</p>
+        )}
 
-            <div className="product-grid">
+        {filteredProducts.map(product => (
 
-                {filteredProducts.length === 0 && (
-                    <p>No products found.</p>
-                )}
+          <div
+            key={product._id}
+            className="product-card"
+            onClick={() => navigate(`/product/${product._id}`)}
+            style={{ cursor: "pointer" }}
+          >
 
-                {filteredProducts.map(product => (
+            <img
+              src={`${API}/${product.image?.replace(/^\/+/, "")}`}
+              alt={product.name}
+            />
 
-                    <div
-                        key={product._id}
-                        className="product-card"
-                        onClick={() => navigate(`/product/${product._id}`)}
-                        style={{ cursor: "pointer" }}
-                    >
+            <h4>{product.name}</h4>
 
-                        <img
-                            src={`http://localhost:5000${product.image}`}
-                            alt={product.name}
-                        />
+            <p className="company-name">{product.company}</p>
 
-                        <h4>{product.name}</h4>
+            <p className="price">₹{product.price}</p>
 
-                        <p className="company-name">
-                            {product.company}
-                        </p>
+            {product.stock > 0 ? (
+              <span className="in-stock">In Stock</span>
+            ) : (
+              <span className="out-stock">Out of Stock</span>
+            )}
 
-                        <p className="price">
-                            ₹{product.price}
-                        </p>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                addToCart(product);
+              }}
+              disabled={product.stock === 0}
+            >
+              Add to Cart
+            </button>
 
-                        {product.stock > 0 ? (
-                            <span className="in-stock">In Stock</span>
-                        ) : (
-                            <span className="out-stock">Out of Stock</span>
-                        )}
+          </div>
 
-                        <button
-                            onClick={(e) => {
-                                e.stopPropagation(); // prevent redirect
-                                addToCart(product);
-                            }}
-                            disabled={product.stock === 0}
-                        >
-                            Add to Cart
-                        </button>
+        ))}
 
-                    </div>
+      </div>
 
-                ))}
-
-            </div>
-
-        </div>
-    );
+    </div>
+  );
 }
 
 export default Home;

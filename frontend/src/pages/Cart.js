@@ -1,157 +1,120 @@
 import React, { useContext } from "react";
-import axios from "axios";
 import { CartContext } from "../context/CartContext";
 import "./Cart.css";
 import StepIndicator from "../components/StepIndicator";
 import { useNavigate } from "react-router-dom";
+
 function Cart() {
-    const API = process.env.REACT_APP_API_URL;
+  const API =
+    process.env.REACT_APP_API_URL || "http://localhost:5000";
 
-    const { cart, addToCart, removeFromCart, getTotal } =
-        useContext(CartContext);
+  const { cart, addToCart, decreaseQuantity, removeFromCart, getTotal } =
+    useContext(CartContext);
 
+  const navigate = useNavigate();
 
-    const navigate = useNavigate();
-    const token = localStorage.getItem("token");
+  const totalItems = cart.reduce(
+    (sum, item) => sum + item.quantity,
+    0
+  );
 
-    const decreaseQty = (item) => {
-        if (item.quantity > 1) {
-            removeFromCart(item._id);
-            for (let i = 1; i < item.quantity; i++) {
-                addToCart(item);
-            }
-        } else {
-            removeFromCart(item._id);
-        }
-    };
+  return (
+    <div className="cart-page">
 
-    const handlePayment = async () => {
-        try {
-            const { data } = await axios.post(
-                `${API}/api/payment/create-order`,
-                { amount: getTotal() },
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`
-                    }
-                }
-            );
+      {cart.length > 0 && <StepIndicator currentStep={1} />}
 
-            const options = {
-                key: "rzp_test_SH7TnETx1QeAgG",
-                amount: data.amount,
-                currency: data.currency,
-                order_id: data.id,
-                name: "Ganesh Electric Shop",
-                description: "Purchase Payment",
-                handler: async function () {
+      <div className="cart-container">
 
-                    await axios.post(
-                        `${API}/api/orders`,
-                        {
-                            items: cart,
-                            totalAmount: getTotal()
-                        },
-                        {
-                            headers: {
-                                Authorization: `Bearer ${token}`
-                            }
-                        }
-                    );
+        <div className="cart-left-section">
+          <h2>Your Shopping Cart</h2>
 
-                    alert("Payment Successful & Order Placed!");
-                }
-            };
+          {cart.length === 0 && (
+            <p className="empty-cart">Your cart is empty.</p>
+          )}
 
-            const rzp = new window.Razorpay(options);
-            rzp.open();
+          {cart.map(item => (
+            <div key={item._id} className="cart-item">
 
-        } catch {
-            alert("Payment failed");
-        }
-    };
+              <img
+                src={`${API}/${item.image?.replace(/^\/+/, "")}`}
+                alt={item.name}
+                className="cart-image"
+              />
 
-    return (
-        <div className="cart-page">
-            {cart.length > 0 && <StepIndicator currentStep={1} />}
+              <div className="cart-details">
+                <h4>{item.name}</h4>
 
-            <div className="cart-container">
+                <div className="cart-price-qty">
+                  <p className="item-price">
+                    ₹{item.price}
+                  </p>
 
-                <div className="cart-left-section">
-                    <h2>Your Shopping Cart</h2>
+                  <div className="quantity-control">
+                    <button
+                      onClick={() =>
+                        decreaseQuantity(item._id)
+                      }
+                    >
+                      -
+                    </button>
 
-                    {cart.length === 0 && (
-                        <p className="empty-cart">Your cart is empty.</p>
-                    )}
+                    <span>{item.quantity}</span>
 
-                    {cart.map(item => (
-                        <div key={item._id} className="cart-item">
-
-                            <img
-                                src={`${API}${item.image}`}
-                                alt={item.name}
-                                className="cart-image"
-                            />
-
-                            <div className="cart-details">
-                                <h4>{item.name}</h4>
-
-                                <div className="cart-price-qty">
-                                    <p className="item-price">
-                                        ₹{item.price}
-                                    </p>
-
-                                    <div className="quantity-control">
-                                        <button onClick={() => decreaseQty(item)}>-</button>
-                                        <span>{item.quantity}</span>
-                                        <button onClick={() => addToCart(item)}>+</button>
-                                    </div>
-                                </div>
-
-                                <p className="item-subtotal">
-                                    Subtotal: ₹{item.price * item.quantity}
-                                </p>
-
-                                <button
-                                    className="remove-btn"
-                                    onClick={() => removeFromCart(item._id)}
-                                >
-                                    Remove
-                                </button>
-
-                            </div>
-                        </div>
-                    ))}
+                    <button
+                      onClick={() => addToCart(item)}
+                    >
+                      +
+                    </button>
+                  </div>
                 </div>
 
-                {cart.length > 0 && (
-                    <div className="cart-summary">
+                <p className="item-subtotal">
+                  Subtotal: ₹
+                  {Number(item.price) * item.quantity}
+                </p>
 
-                        <h3>Order Summary</h3>
+                <button
+                  className="remove-btn"
+                  onClick={() =>
+                    removeFromCart(item._id)
+                  }
+                >
+                  Remove
+                </button>
 
-                        <div className="summary-row">
-                            <span>Total Items:</span>
-                            <span>{cart.length}</span>
-                        </div>
-
-                        <div className="summary-row">
-                            <strong>Total:</strong>
-                            <strong>₹{getTotal()}</strong>
-                        </div>
-
-                        <button
-                            className="checkout-btn"
-                            onClick={() => navigate("/address")}
-                        >
-                            Proceed to Checkout
-                        </button>
-
-                    </div>
-                )}
-
+              </div>
             </div>
+          ))}
         </div>
-    );
+
+        {cart.length > 0 && (
+          <div className="cart-summary">
+
+            <h3>Order Summary</h3>
+
+            <div className="summary-row">
+              <span>Total Items:</span>
+              <span>{totalItems}</span>
+            </div>
+
+            <div className="summary-row">
+              <strong>Total:</strong>
+              <strong>₹{getTotal()}</strong>
+            </div>
+
+            <button
+              className="checkout-btn"
+              onClick={() => navigate("/address")}
+            >
+              Proceed to Checkout
+            </button>
+
+          </div>
+        )}
+
+      </div>
+    </div>
+  );
 }
 
 export default Cart;

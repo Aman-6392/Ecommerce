@@ -1,7 +1,7 @@
 import React from "react";
 import "./StepIndicator.css";
 
-function StepIndicator({ currentStep }) {
+function StepIndicator({ currentStep = 1 }) {
   const steps = ["Cart", "Address", "Review", "Payment"];
 
   return (
@@ -13,20 +13,29 @@ function StepIndicator({ currentStep }) {
           const isCompleted = currentStep > stepNumber;
 
           return (
-            <div
-              key={index}
-              className={`step ${
-                isActive ? "active" : ""
-              } ${isCompleted ? "completed" : ""}`}
-            >
-              <div className="step-circle">
+            <div key={step} className="step">
+              <div
+                className={`step-circle ${
+                  isActive ? "active" : ""
+                } ${isCompleted ? "completed" : ""}`}
+              >
                 {isCompleted ? "✓" : stepNumber}
               </div>
 
-              <div className="step-label">{step}</div>
+              <div
+                className={`step-label ${
+                  isActive ? "active-label" : ""
+                }`}
+              >
+                {step}
+              </div>
 
-              {index !== steps.length - 1 && (
-                <div className="step-line"></div>
+              {index < steps.length - 1 && (
+                <div
+                  className={`step-line ${
+                    isCompleted ? "line-completed" : ""
+                  }`}
+                ></div>
               )}
             </div>
           );

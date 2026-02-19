@@ -1,17 +1,40 @@
 const express = require("express");
 const router = express.Router();
+const mongoose = require("mongoose");
 const Product = require("../models/product");
 const { protect, adminOnly } = require("../middleware/authMiddleware");
 const { upload } = require("../middleware/upload");
 
-
-// ================= GET ALL PRODUCTS =================
+// ================= GET PRODUCTS WITH FILTER + PAGINATION =================
 router.get("/", async (req, res) => {
     try {
-        const products = await Product.find();
-        res.json(products);
+        const { page = 1, limit = 10, category, company, search } = req.query;
+
+        let filter = {};
+
+        if (category) filter.category = category;
+        if (company) filter.company = company;
+
+        if (search) {
+            filter.$text = { $search: search };
+        }
+
+        const products = await Product.find(filter)
+            .skip((page - 1) * limit)
+            .limit(Number(limit))
+            .sort({ createdAt: -1 });
+
+        const total = await Product.countDocuments(filter);
+
+        res.json({
+            total,
+            page: Number(page),
+            pages: Math.ceil(total / limit),
+            products
+        });
+
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ message: "Server error" });
     }
 });
 
@@ -19,32 +42,21 @@ router.get("/", async (req, res) => {
 // ================= RANDOM PRODUCTS =================
 router.get("/random", async (req, res) => {
     try {
-        const products = await Product.find().limit(20);
+        const products = await Product.aggregate([{ $sample: { size: 8 } }]);
         res.json(products);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ message: "Server error" });
     }
 });
 
-
-// ================= SEARCH PRODUCTS =================
-router.get("/search", async (req, res) => {
-    try {
-        const query = req.query.q;
-
-        const products = await Product.find({
-            name: { $regex: query, $options: "i" }
-        });
-
-        res.json(products);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
 
 // ================= GET SINGLE PRODUCT =================
 router.get("/:id", async (req, res) => {
     try {
+        if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+            return res.status(400).json({ message: "Invalid product ID" });
+        }
+
         const product = await Product.findById(req.params.id);
 
         if (!product) {
@@ -54,9 +66,10 @@ router.get("/:id", async (req, res) => {
         res.json(product);
 
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ message: "Server error" });
     }
 });
+
 
 // ================= ADD PRODUCT =================
 router.post(
@@ -67,25 +80,31 @@ router.post(
     async (req, res) => {
         try {
 
+            const { name, price, category, description, stock, company } = req.body;
+
+            if (!name || !price || !category || !company) {
+                return res.status(400).json({ message: "Required fields missing" });
+            }
+
             if (!req.file) {
                 return res.status(400).json({ message: "Image required" });
             }
 
             const newProduct = new Product({
-                name: req.body.name,
-                price: req.body.price,
-                category: req.body.category,
-                description: req.body.description,
-                stock: req.body.stock,
-                company: req.body.company,      // ✅ ADDED
-                image: `/uploads/${req.file.filename}`
+                name,
+                price,
+                category,
+                description,
+                stock,
+                company,
+                image: req.file.path
             });
 
             await newProduct.save();
-            res.json(newProduct);
+            res.status(201).json(newProduct);
 
         } catch (error) {
-            res.status(500).json({ error: error.message });
+            res.status(500).json({ message: "Server error" });
         }
     }
 );
@@ -100,28 +119,32 @@ router.put(
     async (req, res) => {
         try {
 
+            if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+                return res.status(400).json({ message: "Invalid product ID" });
+            }
+
             const product = await Product.findById(req.params.id);
 
             if (!product) {
                 return res.status(404).json({ message: "Product not found" });
             }
 
-            product.name = req.body.name || product.name;
-            product.price = req.body.price || product.price;
-            product.category = req.body.category || product.category;
-            product.description = req.body.description || product.description;
-            product.stock = req.body.stock || product.stock;
-            product.company = req.body.company || product.company;   // ✅ ADDED
+            const fields = ["name", "price", "category", "description", "stock", "company"];
+            fields.forEach(field => {
+                if (req.body[field] !== undefined) {
+                    product[field] = req.body[field];
+                }
+            });
 
             if (req.file) {
-                product.image = `/uploads/${req.file.filename}`;
+                product.image = req.file.path;
             }
 
             await product.save();
             res.json(product);
 
         } catch (error) {
-            res.status(500).json({ error: error.message });
+            res.status(500).json({ message: "Server error" });
         }
     }
 );
@@ -130,12 +153,22 @@ router.put(
 // ================= DELETE PRODUCT =================
 router.delete("/:id", protect, adminOnly, async (req, res) => {
     try {
-        await Product.findByIdAndDelete(req.params.id);
-        res.json({ message: "Product deleted" });
+
+        if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+            return res.status(400).json({ message: "Invalid product ID" });
+        }
+
+        const deleted = await Product.findByIdAndDelete(req.params.id);
+
+        if (!deleted) {
+            return res.status(404).json({ message: "Product not found" });
+        }
+
+        res.json({ message: "Product deleted successfully" });
+
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ message: "Server error" });
     }
 });
-
 
 module.exports = router;

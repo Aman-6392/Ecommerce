@@ -5,48 +5,70 @@ const orderSchema = new mongoose.Schema(
         userId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
+            required: true,
+            index: true
         },
 
         status: {
             type: String,
-            default: "Pending",
-            enum: ["Pending", "Shipped", "Delivered", "Cancelled"],
+            enum: ["Pending", "Processing", "Shipped", "Delivered", "Cancelled"],
+            default: "Pending"
         },
 
         paymentStatus: {
             type: String,
-            default: "Paid",
+            enum: ["Pending", "Paid", "Failed"],
+            default: "Pending"
         },
 
-        paymentId: String,
+        paymentId: {
+            type: String,
+            default: null
+        },
 
         items: [
             {
                 productId: {
                     type: mongoose.Schema.Types.ObjectId,
                     ref: "Product",
+                    required: true
                 },
-                name: String,
-                price: Number,
-                quantity: Number,
-            },
+                name: {
+                    type: String,
+                    required: true
+                },
+                price: {
+                    type: Number,
+                    required: true,
+                    min: 0
+                },
+                quantity: {
+                    type: Number,
+                    required: true,
+                    min: 1
+                }
+            }
         ],
 
         shippingAddress: {
-            name: String,
-            phone: String,
-            street: String,
-            city: String,
-            state: String,
-            pincode: String,
+            name: { type: String, required: true },
+            phone: { type: String, required: true },
+            street: { type: String, required: true },
+            city: { type: String, required: true },
+            state: { type: String, required: true },
+            pincode: { type: String, required: true }
         },
 
         totalAmount: {
             type: Number,
             required: true,
-        },
+            min: 0
+        }
     },
-    { timestamps: true } // ✅ this automatically adds createdAt & updatedAt
+    { timestamps: true }
 );
+
+// Admin performance improvement
+orderSchema.index({ createdAt: -1 });
 
 module.exports = mongoose.model("Order", orderSchema);

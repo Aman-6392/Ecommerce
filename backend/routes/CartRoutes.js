@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const mongoose = require("mongoose");
 const Cart = require("../models/Cart");
 const Product = require("../models/product");
 const { protect } = require("../middleware/authMiddleware");
@@ -8,7 +9,7 @@ const { protect } = require("../middleware/authMiddleware");
 // ================= GET USER CART =================
 router.get("/", protect, async (req, res) => {
     try {
-        const cart = await Cart.findOne({ user: req.user._id })
+        const cart = await Cart.findOne({ user: req.user.id })
             .populate("items.product");
 
         if (!cart) {
@@ -16,8 +17,9 @@ router.get("/", protect, async (req, res) => {
         }
 
         res.json(cart.items);
+
     } catch (error) {
-        res.status(500).json({ message: "Server Error" });
+        res.status(500).json({ message: "Server error" });
     }
 });
 
@@ -27,11 +29,29 @@ router.post("/", protect, async (req, res) => {
     try {
         const { productId, quantity } = req.body;
 
-        let cart = await Cart.findOne({ user: req.user._id });
+        if (!mongoose.Types.ObjectId.isValid(productId)) {
+            return res.status(400).json({ message: "Invalid product ID" });
+        }
+
+        if (!quantity || quantity < 1) {
+            return res.status(400).json({ message: "Invalid quantity" });
+        }
+
+        const product = await Product.findById(productId);
+
+        if (!product) {
+            return res.status(404).json({ message: "Product not found" });
+        }
+
+        if (product.stock < quantity) {
+            return res.status(400).json({ message: "Not enough stock available" });
+        }
+
+        let cart = await Cart.findOne({ user: req.user.id });
 
         if (!cart) {
             cart = new Cart({
-                user: req.user._id,
+                user: req.user.id,
                 items: []
             });
         }
@@ -41,7 +61,14 @@ router.post("/", protect, async (req, res) => {
         );
 
         if (itemIndex > -1) {
-            cart.items[itemIndex].quantity += quantity;
+            const newQuantity = cart.items[itemIndex].quantity + quantity;
+
+            if (newQuantity > product.stock) {
+                return res.status(400).json({ message: "Exceeds available stock" });
+            }
+
+            cart.items[itemIndex].quantity = newQuantity;
+
         } else {
             cart.items.push({
                 product: productId,
@@ -51,13 +78,13 @@ router.post("/", protect, async (req, res) => {
 
         await cart.save();
 
-        const updatedCart = await Cart.findOne({ user: req.user._id })
+        const updatedCart = await Cart.findOne({ user: req.user.id })
             .populate("items.product");
 
         res.json(updatedCart.items);
 
     } catch (error) {
-        res.status(500).json({ message: "Server Error" });
+        res.status(500).json({ message: "Server error" });
     }
 });
 
@@ -67,7 +94,15 @@ router.put("/", protect, async (req, res) => {
     try {
         const { productId, quantity } = req.body;
 
-        const cart = await Cart.findOne({ user: req.user._id });
+        if (!mongoose.Types.ObjectId.isValid(productId)) {
+            return res.status(400).json({ message: "Invalid product ID" });
+        }
+
+        if (!quantity || quantity < 1) {
+            return res.status(400).json({ message: "Invalid quantity" });
+        }
+
+        const cart = await Cart.findOne({ user: req.user.id });
 
         if (!cart) {
             return res.status(404).json({ message: "Cart not found" });
@@ -81,17 +116,23 @@ router.put("/", protect, async (req, res) => {
             return res.status(404).json({ message: "Item not found" });
         }
 
+        const product = await Product.findById(productId);
+
+        if (product.stock < quantity) {
+            return res.status(400).json({ message: "Not enough stock available" });
+        }
+
         item.quantity = quantity;
 
         await cart.save();
 
-        const updatedCart = await Cart.findOne({ user: req.user._id })
+        const updatedCart = await Cart.findOne({ user: req.user.id })
             .populate("items.product");
 
         res.json(updatedCart.items);
 
     } catch (error) {
-        res.status(500).json({ message: "Server Error" });
+        res.status(500).json({ message: "Server error" });
     }
 });
 
@@ -99,25 +140,31 @@ router.put("/", protect, async (req, res) => {
 // ================= REMOVE ITEM =================
 router.delete("/:productId", protect, async (req, res) => {
     try {
-        const cart = await Cart.findOne({ user: req.user._id });
+        const { productId } = req.params;
+
+        if (!mongoose.Types.ObjectId.isValid(productId)) {
+            return res.status(400).json({ message: "Invalid product ID" });
+        }
+
+        const cart = await Cart.findOne({ user: req.user.id });
 
         if (!cart) {
             return res.status(404).json({ message: "Cart not found" });
         }
 
         cart.items = cart.items.filter(
-            item => item.product.toString() !== req.params.productId
+            item => item.product.toString() !== productId
         );
 
         await cart.save();
 
-        const updatedCart = await Cart.findOne({ user: req.user._id })
+        const updatedCart = await Cart.findOne({ user: req.user.id })
             .populate("items.product");
 
         res.json(updatedCart.items);
 
     } catch (error) {
-        res.status(500).json({ message: "Server Error" });
+        res.status(500).json({ message: "Server error" });
     }
 });
 
@@ -125,10 +172,10 @@ router.delete("/:productId", protect, async (req, res) => {
 // ================= CLEAR CART =================
 router.delete("/", protect, async (req, res) => {
     try {
-        await Cart.findOneAndDelete({ user: req.user._id });
-        res.json({ message: "Cart cleared" });
+        await Cart.findOneAndDelete({ user: req.user.id });
+        res.json({ message: "Cart cleared successfully" });
     } catch (error) {
-        res.status(500).json({ message: "Server Error" });
+        res.status(500).json({ message: "Server error" });
     }
 });
 

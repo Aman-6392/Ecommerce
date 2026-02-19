@@ -3,36 +3,42 @@ import { useState, useEffect } from "react";
 import "./RouteLoader.css";
 
 const PrivateRoute = ({ children }) => {
+  const location = useLocation();
 
-    const token = localStorage.getItem("token");
-    const location = useLocation();
-    const [checking, setChecking] = useState(true);
+  const [checking, setChecking] = useState(true);
+  const [token, setToken] = useState(null);
 
-    useEffect(() => {
-        setTimeout(() => {
-            setChecking(false);
-        }, 300);
-    }, []);
+  useEffect(() => {
+    const storedToken = localStorage.getItem("token");
+    setToken(storedToken);
 
-    if (checking) {
-        return (
-            <div className="route-loader">
-                <div className="spinner"></div>
-            </div>
-        );
-    }
+    // small delay for smooth loader effect
+    const timer = setTimeout(() => {
+      setChecking(false);
+    }, 200);
 
-    if (!token) {
-        return (
-            <Navigate 
-                to="/login" 
-                replace 
-                state={{ from: location }} 
-            />
-        );
-    }
+    return () => clearTimeout(timer);
+  }, [location]);
 
-    return children;
+  if (checking) {
+    return (
+      <div className="route-loader">
+        <div className="spinner"></div>
+      </div>
+    );
+  }
+
+  if (!token) {
+    return (
+      <Navigate
+        to="/login"
+        replace
+        state={{ from: location }}
+      />
+    );
+  }
+
+  return children;
 };
 
 export default PrivateRoute;

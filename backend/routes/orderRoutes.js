@@ -1,93 +1,138 @@
 const express = require("express");
 const router = express.Router();
+const mongoose = require("mongoose");
 const Order = require("../models/Order");
-
-// ✅ FIXED IMPORT
+const Product = require("../models/product");
 const { protect, adminOnly } = require("../middleware/authMiddleware");
 
-const Product = require("../models/product");
 
-
-// ================= GET ALL ORDERS (ADMIN ONLY) =================
-router.get(
-    "/all",
-    protect,
-    adminOnly,
-    async (req, res) => {
-        try {
-            const orders = await Order.find()
-                .populate("userId", "name email");
-
-            res.json(orders);
-        } catch (error) {
-            res.status(500).json({ error: error.message });
-        }
-    }
-);
-
-
-// ================= PLACE ORDER =================
-router.post("/", protect, async (req, res) => {
+// ================= GET ALL ORDERS (ADMIN) =================
+router.get("/all", protect, adminOnly, async (req, res) => {
     try {
+        const { page = 1, limit = 10 } = req.query;
 
+        const orders = await Order.find()
+            .populate("userId", "name email")
+            .skip((page - 1) * limit)
+            .limit(Number(limit))
+            .sort({ createdAt: -1 });
+
+        const total = await Order.countDocuments();
+
+        res.json({
+            total,
+            page: Number(page),
+            pages: Math.ceil(total / limit),
+            orders
+        });
+
+    } catch (error) {
+        res.status(500).json({ message: "Server error" });
+    }
+});
+
+
+// ================= PLACE ORDER (SAFE WITH TRANSACTION) =================
+router.post("/", protect, async (req, res) => {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try {
         const { items, totalAmount } = req.body;
 
-        // Reduce stock
+        if (!items || items.length === 0 || !totalAmount) {
+            return res.status(400).json({ message: "Invalid order data" });
+        }
+
         for (let item of items) {
 
-            const product = await Product.findById(item._id);
+            if (!mongoose.Types.ObjectId.isValid(item._id)) {
+                throw new Error("Invalid product ID");
+            }
+
+            const product = await Product.findById(item._id).session(session);
 
             if (!product) {
-                return res.status(404).json({ message: "Product not found" });
+                throw new Error("Product not found");
             }
 
             if (product.stock < item.quantity) {
-                return res.status(400).json({
-                    message: `${product.name} out of stock`
-                });
+                throw new Error(`${product.name} out of stock`);
             }
 
             product.stock -= item.quantity;
-            await product.save();
+            await product.save({ session });
         }
 
         const newOrder = new Order({
             userId: req.user.id,
             items,
-            totalAmount
+            totalAmount,
+            status: "Pending"
         });
 
-        await newOrder.save();
+        await newOrder.save({ session });
 
-        res.json({ message: "Order placed successfully" });
+        await session.commitTransaction();
+        session.endSession();
+
+        res.status(201).json({
+            message: "Order placed successfully",
+            order: newOrder
+        });
 
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        await session.abortTransaction();
+        session.endSession();
+        res.status(400).json({ message: error.message });
     }
 });
 
 
 // ================= USER ORDERS =================
 router.get("/", protect, async (req, res) => {
-    const orders = await Order.find({ userId: req.user.id });
-    res.json(orders);
+    try {
+        const orders = await Order.find({ userId: req.user.id })
+            .sort({ createdAt: -1 });
+
+        res.json(orders);
+    } catch (error) {
+        res.status(500).json({ message: "Server error" });
+    }
 });
 
-// Update Order Status
+
+// ================= UPDATE ORDER STATUS (ADMIN) =================
 router.put("/update-status/:id", protect, adminOnly, async (req, res) => {
-  try {
-    const order = await Order.findById(req.params.id);
+    try {
 
-    if (!order) return res.status(404).json({ message: "Order not found" });
+        if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+            return res.status(400).json({ message: "Invalid order ID" });
+        }
 
-    order.status = req.body.status;
-    await order.save();
+        const order = await Order.findById(req.params.id);
 
-    res.json({ message: "Status updated", order });
-  } catch (err) {
-    res.status(500).json({ message: "Server error" });
-  }
+        if (!order) {
+            return res.status(404).json({ message: "Order not found" });
+        }
+
+        const allowedStatus = ["Pending", "Processing", "Shipped", "Delivered", "Cancelled"];
+
+        if (!allowedStatus.includes(req.body.status)) {
+            return res.status(400).json({ message: "Invalid status value" });
+        }
+
+        order.status = req.body.status;
+        await order.save();
+
+        res.json({
+            message: "Status updated successfully",
+            order
+        });
+
+    } catch (err) {
+        res.status(500).json({ message: "Server error" });
+    }
 });
 
 module.exports = router;
-
