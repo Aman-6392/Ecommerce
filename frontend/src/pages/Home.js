@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import "./Home.css";
 
 function Home() {
+    const API = process.env.REACT_APP_API_URL;
 
     const { addToCart } = useContext(CartContext);
     const navigate = useNavigate();
@@ -19,7 +20,7 @@ function Home() {
 
     // ================= FETCH PRODUCTS =================
     useEffect(() => {
-        axios.get("http://localhost:5000/api/products")
+        axios.get(`${API}/api/products`)
             .then(res => setProducts(res.data))
             .catch(err => console.log(err));
     }, []);
@@ -29,7 +30,7 @@ function Home() {
         const delay = setTimeout(() => {
 
             if (search.trim() !== "") {
-                axios.get(`http://localhost:5000/api/products/search?q=${search}`)
+                axios.get(`${API}/api/products/search?q=${search}`)
                     .then(res => setSuggestions(res.data))
                     .catch(err => console.log(err));
             } else {
@@ -93,7 +94,7 @@ function Home() {
                                 onClick={() => handleSuggestionClick(item)}
                             >
                                 <img
-                                    src={`http://localhost:5000${item.image}`}
+                                    src={`${API}${item.image}`}
                                     alt={item.name}
                                     className="suggestion-img"
                                 />

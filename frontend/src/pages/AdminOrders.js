@@ -8,6 +8,7 @@ function AdminOrders() {
     const [loading, setLoading] = useState(true);
     const token = localStorage.getItem("token");
     const navigate = useNavigate();
+    const API = process.env.REACT_APP_API_URL;
 
     useEffect(() => {
         if (!token) {
@@ -16,7 +17,7 @@ function AdminOrders() {
         }
 
         axios
-            .get("http://localhost:5000/api/orders/all", {
+            .get(`${API}/api/orders/all`, {
                 headers: { Authorization: `Bearer ${token}` },
             })
             .then((res) => setOrders(res.data))
@@ -27,7 +28,7 @@ function AdminOrders() {
     const updateStatus = async (orderId, newStatus) => {
         try {
             await axios.put(
-                `http://localhost:5000/api/orders/update-status/${orderId}`,
+                `${API}/api/orders/update-status/${orderId}`,
                 { status: newStatus },
                 { headers: { Authorization: `Bearer ${token}` } }
             );

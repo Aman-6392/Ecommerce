@@ -6,7 +6,7 @@ import { Link, useNavigate } from "react-router-dom";
 function Login() {
 
     const navigate = useNavigate();
-
+    const API = process.env.REACT_APP_API_URL;
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
@@ -18,7 +18,7 @@ function Login() {
             setLoading(true);
 
             const res = await axios.post(
-                "http://localhost:5000/api/auth/login",
+                `${API}/api/auth/login`,
                 { email, password }
             );
 

@@ -5,6 +5,7 @@ import "./Cart.css";
 import StepIndicator from "../components/StepIndicator";
 import { useNavigate } from "react-router-dom";
 function Cart() {
+    const API = process.env.REACT_APP_API_URL;
 
     const { cart, addToCart, removeFromCart, getTotal } =
         useContext(CartContext);
@@ -27,7 +28,7 @@ function Cart() {
     const handlePayment = async () => {
         try {
             const { data } = await axios.post(
-                "http://localhost:5000/api/payment/create-order",
+                `${API}/api/payment/create-order`,
                 { amount: getTotal() },
                 {
                     headers: {
@@ -46,7 +47,7 @@ function Cart() {
                 handler: async function () {
 
                     await axios.post(
-                        "http://localhost:5000/api/orders",
+                        `${API}/api/orders`,
                         {
                             items: cart,
                             totalAmount: getTotal()
@@ -87,7 +88,7 @@ function Cart() {
                         <div key={item._id} className="cart-item">
 
                             <img
-                                src={`http://localhost:5000${item.image}`}
+                                src={`${API}${item.image}`}
                                 alt={item.name}
                                 className="cart-image"
                             />

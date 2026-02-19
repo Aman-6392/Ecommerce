@@ -6,6 +6,7 @@ import StepIndicator from "../components/StepIndicator";
 import styles from "./Payment.module.css";
 
 function Payment() {
+    const API = process.env.REACT_APP_API_URL;
     const { cart, getTotal } = useContext(CartContext);
     const token = localStorage.getItem("token");
     const navigate = useNavigate();
@@ -16,7 +17,7 @@ function Payment() {
             setLoading(true);
 
             const { data } = await axios.post(
-                "http://localhost:5000/api/payment/create-order",
+                `${API}/api/payment/create-order`,
                 { amount: getTotal() },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -33,7 +34,7 @@ function Payment() {
                     const address = JSON.parse(localStorage.getItem("shippingAddress"));
 
                     await axios.post(
-                        "http://localhost:5000/api/orders",
+                        `${API}/api/orders`,
                         {
                             items: cart,
                             totalAmount: getTotal(),

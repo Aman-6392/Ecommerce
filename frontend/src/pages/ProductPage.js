@@ -9,12 +9,12 @@ function ProductPage() {
     const { id } = useParams();
     const navigate = useNavigate();
     const { addToCart } = useContext(CartContext);
-
+    const API = process.env.REACT_APP_API_URL;
     const [product, setProduct] = useState(null);
     const [quantity, setQuantity] = useState(1);
 
     useEffect(() => {
-        axios.get(`http://localhost:5000/api/products/${id}`)
+        axios.get(`${API}/api/products/${id}`)
             .then(res => setProduct(res.data))
             .catch(err => console.log(err));
     }, [id]);
@@ -35,7 +35,7 @@ function ProductPage() {
                 {/* LEFT IMAGE SECTION */}
                 <div className="product-image-section">
                     <img
-                        src={`http://localhost:5000${product.image}`}
+                        src={`${API}${product.image}`}
                         alt={product.name}
                     />
                 </div>

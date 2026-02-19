@@ -10,6 +10,7 @@ function Admin() {
     const [editingId, setEditingId] = useState(null);
     const [search, setSearch] = useState("");
 
+    const API = process.env.REACT_APP_API_URL;
     // 🔥 NEW FILTER STATES
     const [companyFilter, setCompanyFilter] = useState("");
     const [categoryFilter, setCategoryFilter] = useState("");
@@ -32,7 +33,7 @@ function Admin() {
     }, []);
 
     const loadProducts = () => {
-        axios.get("http://localhost:5000/api/products")
+        axios.get(`${API}/api/products`)
             .then(res => setProducts(res.data))
             .catch(err => console.log(err));
     };
@@ -82,7 +83,7 @@ function Admin() {
 
             if (editingId) {
                 await axios.put(
-                    `http://localhost:5000/api/products/${editingId}`,
+                    `${API}/api/products/${editingId}`,
                     data,
                     {
                         headers: { Authorization: `Bearer ${token}` }
@@ -91,7 +92,7 @@ function Admin() {
                 alert("Product Updated");
             } else {
                 await axios.post(
-                    "http://localhost:5000/api/products",
+                    `${API}/api/products`,
                     data,
                     {
                         headers: { Authorization: `Bearer ${token}` }
@@ -121,7 +122,7 @@ function Admin() {
 
     const handleDelete = async (id) => {
         await axios.delete(
-            `http://localhost:5000/api/products/${id}`,
+            `${API}/api/products/${id}`,
             { headers: { Authorization: `Bearer ${token}` } }
         );
         loadProducts();
@@ -241,7 +242,7 @@ function Admin() {
                 <div key={product._id} className="admin-product">
 
                     <img
-                        src={`http://localhost:5000${product.image}`}
+                        src={`${API}${product.image}`}
                         alt={product.name}
                     />
 
