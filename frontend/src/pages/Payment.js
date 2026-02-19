@@ -8,7 +8,7 @@ import styles from "./Payment.module.css";
 function Payment() {
 
   const RAZORPAY_KEY =
-    process.env.REACT_APP_RAZORPAY_KEY || "rzp_test_xxxxx";
+    process.env.REACT_APP_RAZORPAY_KEY;
 
   const { cart, getTotal, clearCart } =
     useContext(CartContext);
