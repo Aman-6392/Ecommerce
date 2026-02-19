@@ -1,61 +1,101 @@
-/* PAGE */
+/* =========================
+   PAGE BACKGROUND
+========================= */
 .checkoutPage {
-  background: linear-gradient(135deg, #f0f4f9, #ffffff);
   min-height: 100vh;
-  padding-bottom: 60px;
+  background: linear-gradient(120deg, #f8fafc, #eef2f7);
   display: flex;
   flex-direction: column;
   align-items: center;
+  padding: 40px 15px 60px;
 }
 
+/* =========================
+   WRAPPER
+========================= */
 .checkoutWrapper {
   width: 100%;
   max-width: 950px;
-  margin-top: 40px;
-  padding: 0 20px;
 }
 
-/* CARD */
+/* =========================
+   CARD DESIGN (Premium Glass)
+========================= */
 .checkoutCard {
-  background: #ffffff;
-  padding: 45px;
-  border-radius: 18px;
-  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.08);
-  transition: 0.3s ease;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(10px);
+  padding: 50px 45px;
+  border-radius: 22px;
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.05),
+    0 20px 60px rgba(0, 0, 0, 0.06);
+  transition: all 0.35s ease;
+  border: 1px solid rgba(255, 255, 255, 0.4);
 }
 
 .checkoutCard:hover {
-  transform: translateY(-3px);
+  transform: translateY(-5px);
 }
 
+/* =========================
+   TITLE SECTION
+========================= */
 .title {
-  margin-bottom: 6px;
-  font-size: 24px;
+  font-size: 26px;
   font-weight: 700;
+  color: #111827;
+  margin-bottom: 8px;
 }
 
 .subtitle {
+  font-size: 14px;
   color: #6b7280;
-  margin-bottom: 28px;
-  font-size: 14px;
+  margin-bottom: 35px;
 }
 
-/* ERROR */
+/* =========================
+   ERROR BOX
+========================= */
 .formError {
-  background: #fee2e2;
-  color: #b91c1c;
-  padding: 12px 16px;
-  border-radius: 10px;
-  margin-bottom: 22px;
+  background: #fff1f2;
+  color: #dc2626;
+  padding: 14px 18px;
+  border-radius: 12px;
+  margin-bottom: 25px;
   font-size: 14px;
-  border-left: 4px solid #dc2626;
+  border-left: 5px solid #ef4444;
+  animation: shake 0.25s ease-in-out;
 }
 
-/* FORM */
+@keyframes shake {
+  0% {
+    transform: translateX(0);
+  }
+
+  25% {
+    transform: translateX(-4px);
+  }
+
+  50% {
+    transform: translateX(4px);
+  }
+
+  75% {
+    transform: translateX(-3px);
+  }
+
+  100% {
+    transform: translateX(0);
+  }
+}
+
+/* =========================
+   FORM GRID
+========================= */
 .formGrid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 22px;
+  gap: 25px;
 }
 
 .formGroup {
@@ -70,43 +110,62 @@
 .formGroup label {
   font-size: 13px;
   font-weight: 600;
-  margin-bottom: 6px;
+  margin-bottom: 7px;
   color: #374151;
+  letter-spacing: 0.3px;
 }
 
+/* =========================
+   INPUTS
+========================= */
 .inputField,
 .stateSelect {
-  padding: 13px 15px;
-  border-radius: 10px;
-  border: 1px solid #d1d5db;
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
   font-size: 14px;
-  background: #fafafa;
-  transition: all 0.25s ease;
+  background: #f9fafb;
+  transition: all 0.3s ease;
+}
+
+.inputField::placeholder {
+  color: #9ca3af;
 }
 
 .inputField:focus,
 .stateSelect:focus {
   outline: none;
-  border-color: #ff9900;
-  background: #fff;
-  box-shadow: 0 0 0 4px rgba(255, 153, 0, 0.15);
-  transform: scale(1.01);
+  border-color: #ff7a00;
+  background: #ffffff;
+  box-shadow: 0 0 0 4px rgba(255, 122, 0, 0.15);
+  transform: translateY(-1px);
 }
 
-/* BUTTONS */
+/* Hover Effect */
+.inputField:hover,
+.stateSelect:hover {
+  border-color: #d1d5db;
+  background: #ffffff;
+}
+
+/* =========================
+   BUTTONS
+========================= */
 .btnGroup {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 35px;
+  margin-top: 40px;
+  gap: 20px;
 }
 
+/* Back Button */
 .backBtn {
   background: transparent;
   border: 2px solid #d1d5db;
   color: #374151;
-  padding: 12px 22px;
-  border-radius: 30px;
+  padding: 13px 26px;
+  border-radius: 40px;
   cursor: pointer;
   font-weight: 600;
   transition: all 0.3s ease;
@@ -118,25 +177,35 @@
   transform: translateY(-2px);
 }
 
+/* Primary CTA */
 .primaryBtn {
-  background: linear-gradient(135deg, #ff9900, #ff7a00);
-  color: white;
+  background: linear-gradient(135deg, #ff9900, #ff6a00);
+  color: #fff;
   border: none;
-  padding: 11px 22px;
-  border-radius: 8px;
+  padding: 14px 28px;
+  border-radius: 12px;
   cursor: pointer;
-  font-weight: 600;
-  font-size: 14px;
-  transition: all 0.25s ease;
-  box-shadow: 0 6px 14px rgba(255, 153, 0, 0.25);
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 0.4px;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 20px rgba(255, 122, 0, 0.3);
 }
 
 .primaryBtn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 18px rgba(255, 153, 0, 0.35);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 30px rgba(255, 122, 0, 0.45);
 }
 
-/* RESPONSIVE */
+/* =========================
+   RESPONSIVE
+========================= */
+@media (max-width: 900px) {
+  .checkoutCard {
+    padding: 35px 25px;
+  }
+}
+
 @media (max-width: 768px) {
   .formGrid {
     grid-template-columns: 1fr;
@@ -148,11 +217,20 @@
 
   .btnGroup {
     flex-direction: column;
-    gap: 15px;
   }
 
   .primaryBtn,
   .backBtn {
     width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .title {
+    font-size: 22px;
+  }
+
+  .checkoutCard {
+    padding: 25px 18px;
   }
 }
