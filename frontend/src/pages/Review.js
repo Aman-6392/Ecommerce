@@ -32,7 +32,7 @@ function Review() {
       return;
     }
 
-  }, []);
+  }, [address, cart, navigate, token]);
 
   return (
     <div className={styles.reviewPage}>

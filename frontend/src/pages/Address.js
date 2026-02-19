@@ -4,14 +4,14 @@ import styles from "./Address.module.css";
 import StepIndicator from "../components/StepIndicator";
 import { useEffect } from "react";
 function Address() {
+
+  const navigate = useNavigate();
   useEffect(() => {
     const cart = JSON.parse(localStorage.getItem("cart") || "[]");
     if (cart.length === 0) {
       navigate("/");
     }
-  }, []);
-  const navigate = useNavigate();
-
+  }, [navigate]);
   const indianStates = [
     "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar",
     "Chhattisgarh", "Goa", "Gujarat", "Haryana",
