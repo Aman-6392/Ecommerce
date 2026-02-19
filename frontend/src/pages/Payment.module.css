@@ -1,0 +1,153 @@
+.paymentPage {
+  background: linear-gradient(135deg, #f0f4f9, #ffffff);
+  min-height: 100vh;
+  padding: 40px 20px;
+}
+
+.paymentWrapper {
+  max-width: 1100px;
+  margin: 30px auto;
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 30px;
+  align-items: start;
+}
+
+/* LEFT CARD */
+.paymentCard {
+  background: #ffffff;
+  padding: 35px;
+  border-radius: 18px;
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.06);
+  transition: 0.3s ease;
+}
+
+.paymentCard:hover {
+  transform: translateY(-3px);
+}
+
+.title {
+  margin-bottom: 20px;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+/* INFO BOX */
+.infoBox {
+  background: #f9fafb;
+  padding: 18px;
+  border-radius: 12px;
+  margin-bottom: 25px;
+  font-size: 14px;
+  color: #6b7280;
+}
+
+/* AMOUNT */
+.amountBox {
+  background: linear-gradient(135deg, #fff7ed, #ffedd5);
+  padding: 20px;
+  border-radius: 14px;
+  margin-bottom: 25px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.amountBox h3 {
+  font-size: 24px;
+  font-weight: 700;
+  color: #ff7a00;
+}
+
+/* BUTTONS */
+.paymentButtons {
+  display: flex;
+  gap: 15px;
+}
+
+.backBtn {
+  flex: 1;
+  background: #e5e7eb;
+  border: none;
+  padding: 12px;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.backBtn:hover {
+  background: #d1d5db;
+}
+
+.payBtn {
+  flex: 2;
+  background: linear-gradient(135deg, #ff9900, #ff7a00);
+  border: none;
+  padding: 12px;
+  border-radius: 10px;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.payBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(255, 153, 0, 0.35);
+}
+
+.payBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* SUMMARY */
+.summaryCard {
+  background: #ffffff;
+  padding: 30px;
+  border-radius: 18px;
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.06);
+  position: sticky;
+  top: 30px;
+}
+
+.summaryCard h3 {
+  margin-bottom: 20px;
+  font-size: 18px;
+}
+
+.summaryItem {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  font-size: 14px;
+}
+
+.divider {
+  height: 1px;
+  background: #e5e7eb;
+  margin: 15px 0;
+}
+
+.summaryTotal {
+  display: flex;
+  justify-content: space-between;
+  font-weight: 700;
+  font-size: 16px;
+}
+
+/* RESPONSIVE */
+@media (max-width: 900px) {
+  .paymentWrapper {
+    grid-template-columns: 1fr;
+  }
+
+  .summaryCard {
+    position: static;
+  }
+
+  .paymentButtons {
+    flex-direction: column;
+  }
+}

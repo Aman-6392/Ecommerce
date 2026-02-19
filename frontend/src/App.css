@@ -1,0 +1,145 @@
+/* =========================
+   GLOBAL RESET
+========================= */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Segoe UI", Arial, sans-serif;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background-color: #f4f6f9;
+  color: #1f2937;
+  line-height: 1.6;
+}
+
+/* =========================
+   MAIN CONTAINER
+========================= */
+
+.app-wrapper {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Content area */
+.main-content {
+  flex: 1;
+  padding: 20px 0;
+}
+
+/* Centered container */
+.container {
+  width: 90%;
+  max-width: 1200px;
+  margin: auto;
+}
+
+/* =========================
+   HEADINGS
+========================= */
+
+h1 {
+  font-size: 28px;
+  font-weight: 600;
+}
+
+h2 {
+  font-size: 22px;
+  font-weight: 500;
+}
+
+h3 {
+  font-size: 18px;
+}
+
+/* =========================
+   BUTTON BASE STYLE
+========================= */
+
+button {
+  cursor: pointer;
+  border: none;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+/* Primary Button */
+.btn-primary {
+  background-color: #2563eb;
+  color: white;
+  padding: 8px 14px;
+  border-radius: 6px;
+}
+
+.btn-primary:hover {
+  background-color: #1d4ed8;
+}
+
+/* Danger Button */
+.btn-danger {
+  background-color: #dc2626;
+  color: white;
+  padding: 8px 14px;
+  border-radius: 6px;
+}
+
+.btn-danger:hover {
+  background-color: #b91c1c;
+}
+
+/* =========================
+   INPUT BASE STYLE
+========================= */
+
+input,
+select {
+  padding: 8px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  outline: none;
+  font-size: 14px;
+}
+
+input:focus {
+  border-color: #2563eb;
+}
+
+/* =========================
+   LINKS
+========================= */
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* =========================
+   CARD BASE STYLE
+========================= */
+
+.card {
+  background: #ffffff;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* =========================
+   FOOTER BASE
+========================= */
+
+.footer {
+  background-color: #1f2937;
+  color: white;
+  text-align: center;
+  padding: 15px 0;
+}

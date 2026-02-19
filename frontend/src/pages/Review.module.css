@@ -1,0 +1,169 @@
+.reviewPage {
+  background: linear-gradient(135deg, #f0f4f9, #ffffff);
+  min-height: 100vh;
+  padding: 40px 20px;
+}
+
+.stepWrapper {
+  max-width: 1100px;
+  margin: 0 auto 30px auto;
+}
+
+.reviewWrapper {
+  max-width: 1100px;
+  margin: auto;
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 30px;
+}
+
+/* LEFT SECTION */
+.reviewLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+.reviewCard {
+  background: #ffffff;
+  padding: 25px 30px;
+  border-radius: 18px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.06);
+}
+
+.reviewCard h3 {
+  margin-bottom: 18px;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+/* ADDRESS */
+.addressDetails {
+  font-size: 14px;
+  color: #374151;
+  line-height: 1.6;
+}
+
+.name {
+  font-weight: 700;
+  font-size: 15px;
+}
+
+/* ITEMS */
+.reviewItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #f1f1f1;
+}
+
+.reviewItem:last-child {
+  border-bottom: none;
+}
+
+.itemInfo {
+  display: flex;
+  flex-direction: column;
+}
+
+.itemName {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.itemQty {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.itemPrice {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+/* SUMMARY */
+.reviewSummary {
+  background: #ffffff;
+  padding: 25px;
+  border-radius: 18px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.06);
+  height: fit-content;
+  position: sticky;
+  top: 30px;
+}
+
+.reviewSummary h3 {
+  margin-bottom: 20px;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.summaryRow {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  font-size: 14px;
+}
+
+.divider {
+  height: 1px;
+  background: #e5e7eb;
+  margin: 15px 0;
+}
+
+.total {
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.free {
+  color: green;
+  font-weight: 600;
+}
+
+/* BUTTONS */
+.primaryBtn {
+  background: linear-gradient(135deg, #ff9900, #ff7a00);
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 20px;
+  transition: 0.3s ease;
+}
+
+.primaryBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 18px rgba(255, 153, 0, 0.35);
+}
+
+.fullBtn {
+  width: 100%;
+}
+
+.backLink {
+  margin-top: 15px;
+  background: none;
+  border: none;
+  color: #374151;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.backLink:hover {
+  text-decoration: underline;
+}
+
+/* RESPONSIVE */
+@media (max-width: 900px) {
+  .reviewWrapper {
+    grid-template-columns: 1fr;
+  }
+
+  .reviewSummary {
+    position: static;
+  }
+}
