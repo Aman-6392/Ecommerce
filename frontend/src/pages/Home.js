@@ -24,7 +24,6 @@ function Home() {
             try {
                 const res = await axios.get(`${API}/api/products`);
 
-                // 🔥 Handle both formats safely
                 if (Array.isArray(res.data)) {
                     setProducts(res.data);
                 } else if (Array.isArray(res.data.products)) {
@@ -42,6 +41,7 @@ function Home() {
 
         fetchProducts();
     }, []);
+
     // ================= SEARCH SUGGESTIONS =================
     useEffect(() => {
         const delay = setTimeout(() => {
@@ -71,7 +71,6 @@ function Home() {
         navigate(`/product/${product._id}`);
     };
 
-    // 🔥 SAFE UNIQUE LISTS
     const uniqueCompanies = Array.isArray(products)
         ? [...new Set(products.map(p => p.company))]
         : [];
@@ -80,7 +79,6 @@ function Home() {
         ? [...new Set(products.map(p => p.category))]
         : [];
 
-    // 🔥 SAFE FILTER
     const filteredProducts = Array.isArray(products)
         ? products.filter(product => {
 
@@ -119,12 +117,6 @@ function Home() {
                                 className="suggestion-item"
                                 onClick={() => handleSuggestionClick(item)}
                             >
-                                <img
-                                    src={`${API}/${item.image?.replace(/^\/+/, "")}`}
-                                    alt={item.name}
-                                    className="suggestion-img"
-                                />
-
                                 <div>
                                     <p><strong>{item.name}</strong></p>
                                     <p className="company-name">{item.company}</p>
@@ -195,11 +187,6 @@ function Home() {
                         onClick={() => navigate(`/product/${product._id}`)}
                         style={{ cursor: "pointer" }}
                     >
-
-                        <img
-                            src={`${API}/${product.image?.replace(/^\/+/, "")}`}
-                            alt={product.name}
-                        />
 
                         <h4>{product.name}</h4>
 

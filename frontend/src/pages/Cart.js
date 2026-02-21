@@ -3,7 +3,6 @@ import { CartContext } from "../context/CartContext";
 import "./Cart.css";
 import StepIndicator from "../components/StepIndicator";
 import { useNavigate } from "react-router-dom";
-  const API = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
 function Cart() {
 
@@ -33,12 +32,6 @@ function Cart() {
 
           {cart.map(item => (
             <div key={item._id} className="cart-item">
-
-              <img
-                src={`${API}/${item.image?.replace(/^\/+/, "")}`}
-                alt={item.name}
-                className="cart-image"
-              />
 
               <div className="cart-details">
                 <h4>{item.name}</h4>

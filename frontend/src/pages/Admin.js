@@ -2,7 +2,9 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import "./Admin.css";
+
 const API = process.env.REACT_APP_API_URL || "http://localhost:5000";
+
 function Admin() {
     const navigate = useNavigate();
     const token = localStorage.getItem("token");
@@ -26,8 +28,6 @@ function Admin() {
         company: ""
     });
 
-    const [image, setImage] = useState(null);
-
     // ================= AUTH PROTECTION =================
     useEffect(() => {
         if (!token || role?.toLowerCase() !== "admin") {
@@ -47,10 +47,8 @@ function Admin() {
             } else if (Array.isArray(res.data.products)) {
                 setProducts(res.data.products);
             } else {
-                console.error("Invalid products response:", res.data);
                 setProducts([]);
             }
-
         } catch (error) {
             console.error("Load Products Error:", error);
             setProducts([]);
@@ -71,7 +69,6 @@ function Admin() {
             stock: "",
             company: ""
         });
-        setImage(null);
         setShowModal(true);
     };
 
@@ -92,18 +89,11 @@ function Admin() {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        const data = new FormData();
-        Object.keys(formData).forEach(key => {
-            data.append(key, formData[key]);
-        });
-
-        if (image) data.append("image", image);
-
         try {
             if (editingId) {
                 await axios.put(
                     `${API}/api/products/${editingId}`,
-                    data,
+                    formData,
                     {
                         headers: {
                             Authorization: `Bearer ${token}`
@@ -115,7 +105,7 @@ function Admin() {
             } else {
                 await axios.post(
                     `${API}/api/products`,
-                    data,
+                    formData,
                     {
                         headers: {
                             Authorization: `Bearer ${token}`
@@ -128,7 +118,6 @@ function Admin() {
 
             setShowModal(false);
             setEditingId(null);
-            setImage(null);
             loadProducts();
 
         } catch (error) {
@@ -156,40 +145,32 @@ function Admin() {
         }
     };
 
-    // ================= FILTER LOGIC =================
-    const uniqueCompanies = Array.isArray(products)
-        ? [...new Set(products.map(p => p.company))]
-        : [];
-    const uniqueCategories = Array.isArray(products)
-        ? [...new Set(products.map(p => p.category))]
-        : [];
+    const uniqueCompanies = [...new Set(products.map(p => p.company))];
+    const uniqueCategories = [...new Set(products.map(p => p.category))];
 
-    const filteredProducts = Array.isArray(products)
-        ? products.filter(product => {
-            const matchSearch =
-                product.name?.toLowerCase().includes(search.toLowerCase()) ||
-                product.category?.toLowerCase().includes(search.toLowerCase()) ||
-                product.company?.toLowerCase().includes(search.toLowerCase());
+    const filteredProducts = products.filter(product => {
+        const matchSearch =
+            product.name?.toLowerCase().includes(search.toLowerCase()) ||
+            product.category?.toLowerCase().includes(search.toLowerCase()) ||
+            product.company?.toLowerCase().includes(search.toLowerCase());
 
-            const matchCompany =
-                companyFilter === "" || product.company === companyFilter;
+        const matchCompany =
+            companyFilter === "" || product.company === companyFilter;
 
-            const matchCategory =
-                categoryFilter === "" || product.category === categoryFilter;
+        const matchCategory =
+            categoryFilter === "" || product.category === categoryFilter;
 
-            const matchStock =
-                stockFilter === "" ||
-                (stockFilter === "in" && product.stock > 0) ||
-                (stockFilter === "out" && product.stock === 0);
+        const matchStock =
+            stockFilter === "" ||
+            (stockFilter === "in" && product.stock > 0) ||
+            (stockFilter === "out" && product.stock === 0);
 
-            return matchSearch && matchCompany && matchCategory && matchStock;
-        })
-        : [];
+        return matchSearch && matchCompany && matchCategory && matchStock;
+    });
 
     return (
         <div className="admin-container">
 
-            {/* HEADER */}
             <div className="admin-header">
                 <div>
                     <h2 className="admin-title">Admin Panel</h2>
@@ -209,7 +190,6 @@ function Admin() {
                 </div>
             </div>
 
-            {/* SEARCH */}
             <input
                 type="text"
                 placeholder="Search by name, category or company..."
@@ -218,9 +198,7 @@ function Admin() {
                 onChange={(e) => setSearch(e.target.value)}
             />
 
-            {/* FILTERS */}
             <div className="admin-filters">
-
                 <select value={companyFilter}
                     onChange={(e) => setCompanyFilter(e.target.value)}>
                     <option value="">All Companies</option>
@@ -252,19 +230,12 @@ function Admin() {
                     }}>
                     Clear Filters
                 </button>
-
             </div>
 
             <h3>All Products</h3>
 
-            {/* PRODUCT LIST */}
             {filteredProducts.map(product => (
                 <div key={product._id} className="admin-product">
-
-                    <img
-                        src={`${API}/${product.image?.replace(/^\/+/, "")}`}
-                        alt={product.name}
-                    />
 
                     <div className="admin-info">
                         <h4>{product.name}</h4>
@@ -292,7 +263,6 @@ function Admin() {
                 </div>
             ))}
 
-            {/* MODAL */}
             {showModal && (
                 <div className="modal-overlay">
                     <div className="modal-box">
@@ -320,10 +290,6 @@ function Admin() {
                                 value={formData.description}
                                 onChange={handleChange}
                                 placeholder="Description" required />
-
-                            <input type="file"
-                                onChange={(e) => setImage(e.target.files[0])}
-                                required={!editingId} />
 
                             <div className="modal-buttons">
                                 <button type="submit" className="save-btn">

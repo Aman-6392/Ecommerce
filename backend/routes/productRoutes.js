@@ -3,7 +3,6 @@ const router = express.Router();
 const mongoose = require("mongoose");
 const Product = require("../models/product");
 const { protect, adminOnly } = require("../middleware/authMiddleware");
-const { upload } = require("../middleware/upload");
 
 // ================= GET PRODUCTS WITH FILTER + PAGINATION =================
 router.get("/", async (req, res) => {
@@ -38,7 +37,6 @@ router.get("/", async (req, res) => {
     }
 });
 
-
 // ================= RANDOM PRODUCTS =================
 router.get("/random", async (req, res) => {
     try {
@@ -48,7 +46,6 @@ router.get("/random", async (req, res) => {
         res.status(500).json({ message: "Server error" });
     }
 });
-
 
 // ================= GET SINGLE PRODUCT =================
 router.get("/:id", async (req, res) => {
@@ -70,13 +67,11 @@ router.get("/:id", async (req, res) => {
     }
 });
 
-
 // ================= ADD PRODUCT =================
 router.post(
     "/",
     protect,
     adminOnly,
-    upload.single("image"),
     async (req, res) => {
         try {
 
@@ -86,18 +81,13 @@ router.post(
                 return res.status(400).json({ message: "Required fields missing" });
             }
 
-            if (!req.file) {
-                return res.status(400).json({ message: "Image required" });
-            }
-
             const newProduct = new Product({
                 name,
                 price,
                 category,
                 description,
                 stock,
-                company,
-                image: req.file.path
+                company
             });
 
             await newProduct.save();
@@ -109,13 +99,11 @@ router.post(
     }
 );
 
-
 // ================= UPDATE PRODUCT =================
 router.put(
     "/:id",
     protect,
     adminOnly,
-    upload.single("image"),
     async (req, res) => {
         try {
 
@@ -130,15 +118,12 @@ router.put(
             }
 
             const fields = ["name", "price", "category", "description", "stock", "company"];
+
             fields.forEach(field => {
                 if (req.body[field] !== undefined) {
                     product[field] = req.body[field];
                 }
             });
-
-            if (req.file) {
-                product.image = req.file.path;
-            }
 
             await product.save();
             res.json(product);
@@ -148,7 +133,6 @@ router.put(
         }
     }
 );
-
 
 // ================= DELETE PRODUCT =================
 router.delete("/:id", protect, adminOnly, async (req, res) => {

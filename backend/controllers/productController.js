@@ -9,18 +9,13 @@ const addProduct = async (req, res) => {
       return res.status(400).json({ message: "Required fields missing" });
     }
 
-    if (!req.file) {
-      return res.status(400).json({ message: "Product image required" });
-    }
-
     const newProduct = new Product({
       name,
       price,
       category,
       description,
       stock,
-      company,
-      image: req.file.path // Cloudinary URL
+      company
     });
 
     await newProduct.save();
@@ -34,7 +29,6 @@ const addProduct = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
-
 
 // ================= DELETE PRODUCT =================
 const deleteProduct = async (req, res) => {

@@ -3,19 +3,20 @@ import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { CartContext } from "../context/CartContext";
 import "./ProductPage.css";
-  const API = process.env.REACT_APP_API_URL || "http://localhost:5000";
+
+const API = process.env.REACT_APP_API_URL || "http://localhost:5000";
+
 function ProductPage() {
 
   const { id } = useParams();
   const navigate = useNavigate();
   const { addToCart } = useContext(CartContext);
+
   const [product, setProduct] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [loading, setLoading] = useState(true);
 
-  // ================= FETCH PRODUCT =================
   useEffect(() => {
-
     axios.get(`${API}/api/products/${id}`)
       .then(res => {
         setProduct(res.data);
@@ -26,7 +27,6 @@ function ProductPage() {
       .finally(() => {
         setLoading(false);
       });
-
   }, [id]);
 
   if (loading) {
@@ -55,15 +55,7 @@ function ProductPage() {
 
       <div className="product-container">
 
-        {/* IMAGE */}
-        <div className="product-image-section">
-          <img
-            src={`${API}/${product.image?.replace(/^\/+/, "")}`}
-            alt={product.name}
-          />
-        </div>
-
-        {/* DETAILS */}
+        {/* DETAILS ONLY */}
         <div className="product-info-section">
 
           <h1 className="product-title">
@@ -92,7 +84,6 @@ function ProductPage() {
             </span>
           )}
 
-          {/* QUANTITY */}
           <div className="quantity-box">
 
             <button
@@ -117,7 +108,6 @@ function ProductPage() {
 
           </div>
 
-          {/* ACTION BUTTONS */}
           <div className="action-buttons">
 
             <button
